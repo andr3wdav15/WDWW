@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.wdww.Screen
 
@@ -20,6 +21,9 @@ fun BottomNavigationBar(navController: NavController) {
 
     val currentDestinationRoute = navController
         .currentBackStackEntryAsState().value?.destination?.route
+
+    // Check if current route is in bottom nav screens
+    val isBottomNavScreen = screens.any { it.route == currentDestinationRoute }
 
     NavigationBar {
         screens.forEach { screen ->
@@ -51,12 +55,18 @@ fun BottomNavigationBar(navController: NavController) {
                 label = { Text(screen.title) },
                 selected = currentDestinationRoute == screen.route,
                 onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+                    if (!isBottomNavScreen || currentDestinationRoute != screen.route) {
+                        navController.navigate(screen.route) {
+                            // Pop up to the start destination of the graph to
+                            // avoid building up a large stack of destinations
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Avoid multiple copies of the same destination
+                            launchSingleTop = true
+                            // Restore state when reselecting a previously selected item
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
