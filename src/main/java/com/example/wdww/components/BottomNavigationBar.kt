@@ -18,30 +18,31 @@ fun BottomNavigationBar(navController: NavController) {
         Screen.Theaters
     )
 
-    NavigationBar {
-        val currentBackStackEntry = navController.currentBackStackEntryAsState()
-        val currentDestinationRoute = currentBackStackEntry.value?.destination?.route
+    val currentDestinationRoute = navController
+        .currentBackStackEntryAsState().value?.destination?.route
 
+    NavigationBar {
         screens.forEach { screen ->
             NavigationBarItem(
                 icon = {
                     when (screen) {
-                        is Screen.Trending -> Icon(
+                        Screen.Trending -> Icon(
                             Icons.Default.Star,
                             contentDescription = screen.title
                         )
-
-                        is Screen.Movies -> Icon(
+                        Screen.Movies -> Icon(
                             Icons.Default.Star,
                             contentDescription = screen.title
                         )
-
-                        is Screen.TVShows -> Icon(
+                        Screen.TVShows -> Icon(
                             Icons.Default.Star,
                             contentDescription = screen.title
                         )
-
-                        is Screen.Theaters -> Icon(
+                        Screen.Theaters -> Icon(
+                            Icons.Default.Star,
+                            contentDescription = screen.title
+                        )
+                        else -> Icon(
                             Icons.Default.Star,
                             contentDescription = screen.title
                         )

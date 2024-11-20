@@ -64,7 +64,22 @@ dependencies {
     // add viewmodel compose
     implementation libs.androidx.lifecycle.viewmodel.compose
     implementation platform(libs.androidx.compose.bom.v20230601)
+    implementation "androidx.compose.material3:material3:1.2.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1"
 
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    
+    // For ViewModels in Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    // OkHttp logging interceptor
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
 
 }
