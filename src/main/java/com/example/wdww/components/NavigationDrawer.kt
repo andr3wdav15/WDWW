@@ -32,51 +32,27 @@ fun NavigationDrawer(
 
     ModalDrawerSheet {
         Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "My Lists",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp)
-        )
-        HorizontalDivider()
         
         drawerScreens.forEach { screen ->
             NavigationDrawerItem(
                 label = { Text(screen.title) },
                 selected = false,
-                onClick = {
-                    onNavigate(screen)
-                    onClose()
-                },
-                icon = {
-                    when (screen) {
-                        Screen.MyMovies -> Icon(Icons.Default.Star, contentDescription = null)
-                        Screen.MyTV -> Icon(Icons.Default.Star, contentDescription = null)
-                        Screen.MyAlerts -> Icon(Icons.Default.Star, contentDescription = null)
-                        else -> Icon(Icons.Default.Star, contentDescription = null)
-                    }
-                },
+                onClick = { onNavigate(screen) },
+                icon = { Icon(Icons.Default.Star, contentDescription = null) },
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
         }
-
-        Spacer(modifier = Modifier.weight(1f))
         
-        HorizontalDivider()
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 16.dp)
+        )
+        
         NavigationDrawerItem(
             label = { Text("Logout") },
             selected = false,
-            onClick = {
-                onLogout()
-                onClose()
-            },
-            icon = {
-                Icon(
-                    Icons.Default.ExitToApp,
-                    contentDescription = "Logout"
-                )
-            },
+            onClick = onLogout,
+            icon = { Icon(Icons.Default.ExitToApp, contentDescription = null) },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
     }
 } 

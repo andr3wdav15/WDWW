@@ -86,7 +86,13 @@ fun MainContent(
                     scope.launch { drawerState.close() }
                 },
                 onNavigate = { screen ->
-                    navController.navigate(screen.route)
+                    navController.navigate(screen.route) {
+                        popUpTo(Screen.Trending.route) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                     scope.launch { drawerState.close() }
                 },
                 onLogout = {

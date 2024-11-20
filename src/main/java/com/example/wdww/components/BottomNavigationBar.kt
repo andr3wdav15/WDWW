@@ -19,11 +19,8 @@ fun BottomNavigationBar(navController: NavController) {
         Screen.Theaters
     )
 
-    val currentDestinationRoute = navController
-        .currentBackStackEntryAsState().value?.destination?.route
-
-    // Check if current route is in bottom nav screens
-    val isBottomNavScreen = screens.any { it.route == currentDestinationRoute }
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
 
     NavigationBar {
         screens.forEach { screen ->
@@ -53,29 +50,16 @@ fun BottomNavigationBar(navController: NavController) {
                     }
                 },
                 label = { Text(screen.title) },
-                selected = currentDestinationRoute == screen.route,
+                selected = currentRoute == screen.route,
                 onClick = {
-                    if (!isBottomNavScreen || currentDestinationRoute != screen.route) {
-                        navController.navigate(screen.route) {
-                            // Pop up to the start destination of the graph to
-                            // avoid building up a large stack of destinations
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            // Avoid multiple copies of the same destination
-                            launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                            restoreState = true
+                    navController.navigate(screen.route) {
+                        popUpTo(Screen.Trending.route) {
+                            saveState = true
                         }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.primary,
-                    unselectedIconColor = Color.Gray,
-                    selectedTextColor = MaterialTheme.colorScheme.primary,
-                    unselectedTextColor = Color.Gray,
-                    indicatorColor = MaterialTheme.colorScheme.secondaryContainer
-                )
+                }
             )
         }
     }
