@@ -16,7 +16,7 @@ class AuthManager(private val context: Context) {
     companion object {
         private val SESSION_ID_KEY = stringPreferencesKey("session_id")
         private val SESSION_TIMESTAMP_KEY = longPreferencesKey("session_timestamp")
-        private const val SESSION_DURATION = 60 * 60 * 1000 // 60 minutes in milliseconds
+        private const val SESSION_DURATION = 60 * 60 * 1000
     }
 
     val sessionId: Flow<String?> = context.dataStore.data.map { preferences ->
