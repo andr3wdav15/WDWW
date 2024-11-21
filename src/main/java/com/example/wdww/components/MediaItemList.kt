@@ -10,12 +10,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.wdww.model.MediaItem
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import com.example.wdww.model.MediaItem
+import com.example.wdww.viewmodel.SharedViewModel
+import com.example.wdww.viewmodel.AuthViewModel
 
 @Composable
 fun MediaItemList(
@@ -24,7 +27,9 @@ fun MediaItemList(
     showGenre: Boolean = false,
     onLoadMore: () -> Unit = {},
     showHeader: Boolean = true,
-    showLoadingIndicator: Boolean = false
+    showLoadingIndicator: Boolean = false,
+    sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel
 ) {
     val listState = rememberLazyListState()
 
@@ -44,15 +49,18 @@ fun MediaItemList(
     }
 
     LazyColumn(
-        modifier = Modifier,
-        state = listState
+        state = listState,
+        contentPadding = PaddingValues(
+            top = if (showHeader) 16.dp else 0.dp,
+            bottom = 16.dp
+        )
     ) {
         if (showHeader) {
             item {
                 Text(
                     text = headerTitle,
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
             }
         }
@@ -60,7 +68,9 @@ fun MediaItemList(
         items(mediaItems) { mediaItem ->
             MediaItemCard(
                 mediaItem = mediaItem,
-                showGenre = showGenre
+                showGenre = showGenre,
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         }
 
@@ -72,9 +82,7 @@ fun MediaItemList(
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp)
-                    )
+                    CircularProgressIndicator()
                 }
             }
         }

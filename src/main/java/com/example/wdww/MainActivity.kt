@@ -5,10 +5,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -23,6 +26,8 @@ import com.example.wdww.screens.*
 import com.example.wdww.ui.theme.WDWWTheme
 import com.example.wdww.viewmodel.AuthViewModel
 import com.example.wdww.viewmodel.SharedViewModel
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
@@ -134,7 +139,15 @@ fun MainContent(
                 }
             ) { paddingValues ->
                 Box(
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(
+                        PaddingValues(
+                            top = if (navController.currentDestination?.route == "search") 0.dp 
+                                  else paddingValues.calculateTopPadding(),
+                            bottom = paddingValues.calculateBottomPadding(),
+                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+                        )
+                    )
                 ) {
                     NavigationHost(
                         navController = navController,

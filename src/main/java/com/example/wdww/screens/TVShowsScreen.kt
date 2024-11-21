@@ -13,9 +13,13 @@ import com.example.wdww.model.MediaItem
 import com.example.wdww.network.RetrofitInstance
 import com.example.wdww.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
+import com.example.wdww.viewmodel.AuthViewModel
 
 @Composable
-fun TVShowsScreen(sharedViewModel: SharedViewModel) {
+fun TVShowsScreen(
+    sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel
+) {
     val pagerState = rememberPagerState { 5 }
     val coroutineScope = rememberCoroutineScope()
     val pages = listOf(
@@ -49,18 +53,21 @@ fun TVShowsScreen(sharedViewModel: SharedViewModel) {
             modifier = Modifier.fillMaxSize()
         ) { page ->
             when (page) {
-                0 -> PopularTVContent(sharedViewModel)
-                1 -> StreamingServiceTVContent(sharedViewModel, "Netflix", "8")
-                2 -> StreamingServiceTVContent(sharedViewModel, "Disney+", "337")
-                3 -> StreamingServiceTVContent(sharedViewModel, "Apple TV", "350")
-                4 -> StreamingServiceTVContent(sharedViewModel, "Crave", "230")
+                0 -> PopularTVContent(sharedViewModel, authViewModel)
+                1 -> StreamingServiceTVContent(sharedViewModel, authViewModel, "Netflix", "8")
+                2 -> StreamingServiceTVContent(sharedViewModel, authViewModel, "Disney+", "337")
+                3 -> StreamingServiceTVContent(sharedViewModel, authViewModel, "Apple TV", "350")
+                4 -> StreamingServiceTVContent(sharedViewModel, authViewModel, "Crave", "230")
             }
         }
     }
 }
 
 @Composable
-private fun PopularTVContent(sharedViewModel: SharedViewModel) {
+private fun PopularTVContent(
+    sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel
+) {
     var isLoading by remember { mutableStateOf(false) }
     var currentPage by remember { mutableIntStateOf(1) }
     var hasMorePages by remember { mutableStateOf(true) }
@@ -126,7 +133,10 @@ private fun PopularTVContent(sharedViewModel: SharedViewModel) {
                             }
                         }
                     }
-                }
+                },
+                showLoadingIndicator = isLoading,
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         }
 
@@ -151,6 +161,7 @@ private fun PopularTVContent(sharedViewModel: SharedViewModel) {
 @Composable
 private fun StreamingServiceTVContent(
     sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel,
     serviceName: String,
     providerId: String
 ) {
@@ -223,7 +234,10 @@ private fun StreamingServiceTVContent(
                             }
                         }
                     }
-                }
+                },
+                showLoadingIndicator = isLoading,
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         }
 

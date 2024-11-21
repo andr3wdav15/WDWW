@@ -70,7 +70,9 @@ fun MyMoviesScreen(
                 headerTitle = "My Movies",
                 showGenre = true,
                 onLoadMore = { /* No pagination for favorites */ },
-                showLoadingIndicator = false
+                showLoadingIndicator = false,
+                authViewModel = authViewModel,
+                sharedViewModel = sharedViewModel
             )
         } else if (error == null) {
             Text(

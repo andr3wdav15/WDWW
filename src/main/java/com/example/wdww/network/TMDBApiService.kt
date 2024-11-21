@@ -6,6 +6,8 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.POST
+import retrofit2.http.Body
 
 interface TMDBApiService {
     @GET("trending/all/day")
@@ -74,10 +76,17 @@ interface TMDBApiService {
         @Query("page") page: Int
     ): Response<TrendingResponse>
 
-    @GET("discover/multi")
-    suspend fun discoverMedia(
+    @GET("discover/movie")
+    suspend fun discoverMovies(
         @Query("api_key") apiKey: String,
-        @Query("query") query: String,
+        @Query("with_genres") genreId: String,
+        @Query("page") page: Int
+    ): Response<TrendingResponse>
+
+    @GET("discover/tv")
+    suspend fun discoverTVShows(
+        @Query("api_key") apiKey: String,
+        @Query("with_genres") genreId: String,
         @Query("page") page: Int
     ): Response<TrendingResponse>
 
@@ -87,4 +96,45 @@ interface TMDBApiService {
         @Query("query") query: String,
         @Query("page") page: Int
     ): Response<TrendingResponse>
+
+    @GET("movie/{movie_id}")
+    suspend fun getMovieDetails(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("append_to_response") appendToResponse: String = "credits"
+    ): Response<MediaDetails>
+
+    @GET("tv/{tv_id}")
+    suspend fun getTVShowDetails(
+        @Path("tv_id") tvId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("append_to_response") appendToResponse: String = "credits"
+    ): Response<MediaDetails>
+
+    @POST("account/{account_id}/favorite")
+    suspend fun addToFavorites(
+        @Path("account_id") accountId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("session_id") sessionId: String,
+        @Body body: AddToFavoritesRequest
+    ): Response<StatusResponse>
+
+    @GET("{media_type}/{id}")
+    suspend fun getMediaDetails(
+        @Path("media_type") mediaType: String,
+        @Path("id") mediaId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("append_to_response") appendToResponse: String
+    ): Response<MediaDetails>
 }
+
+data class AddToFavoritesRequest(
+    val mediaType: String, // "movie" or "tv"
+    val mediaId: Int,
+    val favorite: Boolean
+)
+
+data class StatusResponse(
+    val statusCode: Int,
+    val statusMessage: String
+)

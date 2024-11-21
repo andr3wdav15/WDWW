@@ -11,16 +11,17 @@ import androidx.compose.ui.unit.dp
 import com.example.wdww.components.MediaItemList
 import com.example.wdww.model.MediaItem
 import com.example.wdww.network.RetrofitInstance
+import com.example.wdww.viewmodel.AuthViewModel
 import com.example.wdww.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun MoviesScreen(sharedViewModel: SharedViewModel) {
+fun MoviesScreen(sharedViewModel: SharedViewModel, authViewModel: AuthViewModel) {
     val pagerState = rememberPagerState { 6 }
     val coroutineScope = rememberCoroutineScope()
     val pages = listOf(
-        "All", 
-        "Netflix", 
+        "All",
+        "Netflix",
         "Disney+",
         "Apple TV",
         "Crave",
@@ -50,19 +51,19 @@ fun MoviesScreen(sharedViewModel: SharedViewModel) {
             modifier = Modifier.fillMaxSize()
         ) { page ->
             when (page) {
-                0 -> PopularMoviesContent(sharedViewModel)
-                1 -> StreamingServiceMoviesContent(sharedViewModel, "Netflix", "8")
-                2 -> StreamingServiceMoviesContent(sharedViewModel, "Disney+", "337")
-                3 -> StreamingServiceMoviesContent(sharedViewModel, "Apple TV", "350")
-                4 -> StreamingServiceMoviesContent(sharedViewModel, "Crave", "230")
-                5 -> StreamingServiceMoviesContent(sharedViewModel, "Paramount+", "531")
+                0 -> PopularMoviesContent(sharedViewModel, authViewModel)
+                1 -> StreamingServiceMoviesContent(sharedViewModel, authViewModel, "Netflix", "8")
+                2 -> StreamingServiceMoviesContent(sharedViewModel, authViewModel, "Disney+", "337")
+                3 -> StreamingServiceMoviesContent(sharedViewModel, authViewModel, "Apple TV", "350")
+                4 -> StreamingServiceMoviesContent(sharedViewModel, authViewModel, "Crave", "230")
+                5 -> StreamingServiceMoviesContent(sharedViewModel, authViewModel, "Paramount+", "531")
             }
         }
     }
 }
 
 @Composable
-private fun PopularMoviesContent(sharedViewModel: SharedViewModel) {
+private fun PopularMoviesContent(sharedViewModel: SharedViewModel, authViewModel: AuthViewModel) {
     var isLoading by remember { mutableStateOf(false) }
     var currentPage by remember { mutableIntStateOf(1) }
     var hasMorePages by remember { mutableStateOf(true) }
@@ -78,7 +79,7 @@ private fun PopularMoviesContent(sharedViewModel: SharedViewModel) {
                     apiKey = "c5479e7394cd551bad2a1af7e9bff8a3",
                     page = 1
                 )
-                
+
                 if (response.isSuccessful) {
                     response.body()?.let { moviesResponse ->
                         allMediaItems.addAll(moviesResponse.results)
@@ -111,7 +112,7 @@ private fun PopularMoviesContent(sharedViewModel: SharedViewModel) {
                                     apiKey = "c5479e7394cd551bad2a1af7e9bff8a3",
                                     page = currentPage
                                 )
-                                
+
                                 if (response.isSuccessful) {
                                     response.body()?.let { moviesResponse ->
                                         allMediaItems.addAll(moviesResponse.results)
@@ -128,7 +129,10 @@ private fun PopularMoviesContent(sharedViewModel: SharedViewModel) {
                             }
                         }
                     }
-                }
+                },
+                showLoadingIndicator = isLoading,
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         }
 
@@ -153,6 +157,7 @@ private fun PopularMoviesContent(sharedViewModel: SharedViewModel) {
 @Composable
 private fun StreamingServiceMoviesContent(
     sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel,
     serviceName: String,
     providerId: String
 ) {
@@ -173,7 +178,7 @@ private fun StreamingServiceMoviesContent(
                     watchRegion = "CA",
                     page = currentPage
                 )
-                
+
                 if (response.isSuccessful) {
                     response.body()?.let { moviesResponse ->
                         allMediaItems.addAll(moviesResponse.results)
@@ -208,7 +213,7 @@ private fun StreamingServiceMoviesContent(
                                     watchRegion = "CA",
                                     page = currentPage
                                 )
-                                
+
                                 if (response.isSuccessful) {
                                     response.body()?.let { moviesResponse ->
                                         allMediaItems.addAll(moviesResponse.results)
@@ -225,7 +230,10 @@ private fun StreamingServiceMoviesContent(
                             }
                         }
                     }
-                }
+                },
+                showLoadingIndicator = isLoading,
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         }
 

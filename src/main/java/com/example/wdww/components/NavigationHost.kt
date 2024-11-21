@@ -26,16 +26,28 @@ fun NavigationHost(
 ) {
     NavHost(navController, startDestination = Screen.Trending.route, modifier = modifier) {
         composable(Screen.Trending.route) {
-            TrendingScreen(sharedViewModel = sharedViewModel)
+            TrendingScreen(
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
+            )
         }
         composable(Screen.Movies.route) {
-            MoviesScreen(sharedViewModel = sharedViewModel)
+            MoviesScreen(
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
+            )
         }
         composable(Screen.TVShows.route) {
-            TVShowsScreen(sharedViewModel = sharedViewModel)
+            TVShowsScreen(
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
+            )
         }
         composable(Screen.Theaters.route) {
-            TheatersScreen(sharedViewModel = sharedViewModel)
+            TheatersScreen(
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
+            )
         }
         composable(Screen.MyMovies.route) {
             MyMoviesScreen(
@@ -50,12 +62,16 @@ fun NavigationHost(
             )
         }
         composable(Screen.MyAlerts.route) {
-            MyAlertsScreen(sharedViewModel = sharedViewModel)
+            MyAlertsScreen(
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
+            )
         }
         composable("search") {
             SearchScreen(
                 sharedViewModel = sharedViewModel,
-                navController = navController
+                navController = navController,
+                authViewModel = authViewModel
             )
         }
     }

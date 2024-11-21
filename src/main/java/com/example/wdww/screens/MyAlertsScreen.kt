@@ -7,9 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.wdww.viewmodel.SharedViewModel
+import com.example.wdww.viewmodel.AuthViewModel
 
 @Composable
-fun MyAlertsScreen(sharedViewModel: SharedViewModel) {
+fun MyAlertsScreen(
+    sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

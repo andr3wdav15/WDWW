@@ -14,9 +14,13 @@ import com.example.wdww.network.RetrofitInstance
 import com.example.wdww.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import com.example.wdww.viewmodel.AuthViewModel
 
 @Composable
-fun TheatersScreen(sharedViewModel: SharedViewModel) {
+fun TheatersScreen(
+    sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel
+) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
     val pages = listOf("Coming Soon", "Now Playing")
@@ -43,15 +47,18 @@ fun TheatersScreen(sharedViewModel: SharedViewModel) {
             modifier = Modifier.fillMaxSize()
         ) { page ->
             when (page) {
-                0 -> UpcomingMoviesContent(sharedViewModel)
-                1 -> NowPlayingContent(sharedViewModel)
+                0 -> UpcomingMoviesContent(sharedViewModel, authViewModel)
+                1 -> NowPlayingContent(sharedViewModel, authViewModel)
             }
         }
     }
 }
 
 @Composable
-private fun UpcomingMoviesContent(sharedViewModel: SharedViewModel) {
+private fun UpcomingMoviesContent(
+    sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel
+) {
     var isLoading by remember { mutableStateOf(false) }
     var currentPage by remember { mutableIntStateOf(1) }
     var hasMorePages by remember { mutableStateOf(true) }
@@ -130,7 +137,10 @@ private fun UpcomingMoviesContent(sharedViewModel: SharedViewModel) {
                             }
                         }
                     }
-                }
+                },
+                showLoadingIndicator = isLoading,
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         }
 
@@ -153,7 +163,10 @@ private fun UpcomingMoviesContent(sharedViewModel: SharedViewModel) {
 }
 
 @Composable
-private fun NowPlayingContent(sharedViewModel: SharedViewModel) {
+private fun NowPlayingContent(
+    sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel
+) {
     var isLoading by remember { mutableStateOf(false) }
     var currentPage by remember { mutableIntStateOf(1) }
     var hasMorePages by remember { mutableStateOf(true) }
@@ -219,7 +232,10 @@ private fun NowPlayingContent(sharedViewModel: SharedViewModel) {
                             }
                         }
                     }
-                }
+                },
+                showLoadingIndicator = isLoading,
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         }
 

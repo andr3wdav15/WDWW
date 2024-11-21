@@ -69,10 +69,10 @@ fun MyTVScreen(
                 mediaItems = allMediaItems,
                 headerTitle = "My TV Shows",
                 showGenre = true,
-                onLoadMore = {
-                    // Not implemented for TV shows
-                },
-                showLoadingIndicator = false
+                onLoadMore = { /* No pagination for favorites */ },
+                showLoadingIndicator = false,
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         } else if (error == null) {
             Text(

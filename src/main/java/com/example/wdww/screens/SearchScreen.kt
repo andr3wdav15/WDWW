@@ -16,12 +16,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.navigation.NavController
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import com.example.wdww.viewmodel.AuthViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     sharedViewModel: SharedViewModel,
-    navController: NavController
+    navController: NavController,
+    authViewModel: AuthViewModel
 ) {
     var isLoading by remember { mutableStateOf(false) }
     var currentPage by remember { mutableIntStateOf(1) }
@@ -45,10 +48,13 @@ fun SearchScreen(
                     query = searchQuery,
                     page = currentPage
                 )
-                
+
                 if (response.isSuccessful) {
                     response.body()?.let { searchResponse ->
-                        allMediaItems.addAll(searchResponse.results)
+                        val filteredResults = searchResponse.results.filter { item ->
+                            item.mediaType == "movie" || item.mediaType == "tv"
+                        }
+                        allMediaItems.addAll(filteredResults)
                         hasMorePages = currentPage < searchResponse.totalPages
                         currentPage++
                     }
@@ -66,22 +72,29 @@ fun SearchScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        TopAppBar(
-            title = { Text("Search Results") },
-            navigationIcon = {
-                IconButton(
-                    onClick = { 
-                        keyboardController?.hide()
-                        navController.popBackStack()
-                    }
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
-                    )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = {
+                    keyboardController?.hide()
+                    sharedViewModel.updateSearchQuery("")
+                    navController.popBackStack()
                 }
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
             }
-        )
+            Text(
+                text = "Search Results",
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
 
         Box(modifier = Modifier.fillMaxSize()) {
             MediaItemList(
@@ -97,10 +110,13 @@ fun SearchScreen(
                                     query = searchQuery,
                                     page = currentPage
                                 )
-                                
+
                                 if (response.isSuccessful) {
                                     response.body()?.let { searchResponse ->
-                                        allMediaItems.addAll(searchResponse.results)
+                                        val filteredResults = searchResponse.results.filter { item ->
+                                            item.mediaType == "movie" || item.mediaType == "tv"
+                                        }
+                                        allMediaItems.addAll(filteredResults)
                                         hasMorePages = currentPage < searchResponse.totalPages
                                         currentPage++
                                     }
@@ -116,7 +132,9 @@ fun SearchScreen(
                     }
                 },
                 showHeader = false,
-                showLoadingIndicator = isLoading
+                showLoadingIndicator = isLoading,
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
 
             if (isLoading && allMediaItems.isEmpty()) {
