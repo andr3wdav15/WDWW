@@ -13,6 +13,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,7 +24,8 @@ fun SearchBar(
     onMenuClick: () -> Unit,
     onSearchTextChanged: (String) -> Unit,
     searchTextState: String,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    navController: NavController
 ) {
     var showKeyboard by remember { mutableStateOf(false) }
 
@@ -28,7 +33,14 @@ fun SearchBar(
         title = {
             TextField(
                 value = searchTextState,
-                onValueChange = onSearchTextChanged,
+                onValueChange = { newText ->
+                    onSearchTextChanged(newText)
+                    if (newText.isNotEmpty()) {
+                        if (navController.currentDestination?.route != "search") {
+                            navController.navigate("search")
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester)
@@ -38,8 +50,24 @@ fun SearchBar(
                 placeholder = { Text(text = "Search") },
                 singleLine = true,
                 trailingIcon = {
-                    Icon(Icons.Default.Search, contentDescription = "Search Icon")
+                    IconButton(onClick = {
+                        if (searchTextState.isNotEmpty()) {
+                            navController.navigate("search")
+                        }
+                    }) {
+                        Icon(Icons.Default.Search, contentDescription = "Search Icon")
+                    }
                 },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Search
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        if (searchTextState.isNotEmpty()) {
+                            navController.navigate("search")
+                        }
+                    }
+                ),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                     focusedContainerColor = MaterialTheme.colorScheme.surface

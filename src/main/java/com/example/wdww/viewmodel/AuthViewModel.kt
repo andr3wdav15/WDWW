@@ -97,6 +97,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    suspend fun getSessionId(): String? {
+        return authManager.sessionId.first()
+    }
+
     companion object {
         private const val API_KEY = "c5479e7394cd551bad2a1af7e9bff8a3"
         private const val REDIRECT_URI = "wdww://auth"

@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TrendingScreen(sharedViewModel: SharedViewModel) {
     var isLoading by remember { mutableStateOf(false) }
-    var currentPage by remember { mutableStateOf(1) }
+    var currentPage by remember { mutableIntStateOf(1) }
     var hasMorePages by remember { mutableStateOf(true) }
     val allMediaItems = remember { mutableStateListOf<MediaItem>() }
     var error by remember { mutableStateOf<String?>(null) }
@@ -53,6 +53,7 @@ fun TrendingScreen(sharedViewModel: SharedViewModel) {
             MediaItemList(
                 mediaItems = allMediaItems,
                 headerTitle = "Trending",
+                showGenre = false,
                 onLoadMore = {
                     if (!isLoading && hasMorePages) {
                         coroutineScope.launch {

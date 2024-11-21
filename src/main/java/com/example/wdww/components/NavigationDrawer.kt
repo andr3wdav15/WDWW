@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -51,7 +51,7 @@ fun NavigationDrawer(
             label = { Text("Logout") },
             selected = false,
             onClick = onLogout,
-            icon = { Icon(Icons.Default.ExitToApp, contentDescription = null) },
+            icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null) },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
     }

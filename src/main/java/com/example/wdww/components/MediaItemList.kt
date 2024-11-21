@@ -20,9 +20,11 @@ import kotlinx.coroutines.flow.map
 @Composable
 fun MediaItemList(
     mediaItems: List<MediaItem>,
-    modifier: Modifier = Modifier,
-    headerTitle: String? = null,
-    onLoadMore: () -> Unit
+    headerTitle: String = "",
+    showGenre: Boolean = false,
+    onLoadMore: () -> Unit = {},
+    showHeader: Boolean = true,
+    showLoadingIndicator: Boolean = false
 ) {
     val listState = rememberLazyListState()
 
@@ -43,26 +45,27 @@ fun MediaItemList(
     }
 
     LazyColumn(
-        modifier = modifier,
+        modifier = Modifier,
         state = listState
     ) {
-        if (!headerTitle.isNullOrEmpty()) {
+        if (showHeader) {
             item {
                 Text(
                     text = headerTitle,
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier
-                        .padding(top = 16.dp, start = 12.dp)
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.padding(16.dp)
                 )
             }
         }
-        
+
         items(mediaItems) { mediaItem ->
-            MediaItemCard(mediaItem)
+            MediaItemCard(
+                mediaItem = mediaItem,
+                showGenre = showGenre
+            )
         }
 
-        if (mediaItems.isNotEmpty()) {
+        if (showLoadingIndicator && mediaItems.isNotEmpty()) {
             item {
                 Box(
                     modifier = Modifier

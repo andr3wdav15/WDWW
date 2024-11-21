@@ -90,4 +90,9 @@ dependencies {
 
     implementation(libs.coil.compose.v240)
 
+    implementation libs.androidx.foundation
+    implementation libs.accompanist.pager
+    implementation libs.accompanist.pager.indicators
+
+
 }

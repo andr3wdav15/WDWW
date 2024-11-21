@@ -13,13 +13,19 @@ import com.example.wdww.screens.TrendingScreen
 import com.example.wdww.screens.MyMoviesScreen
 import com.example.wdww.screens.MyTVScreen
 import com.example.wdww.screens.MyAlertsScreen
+import com.example.wdww.screens.SearchScreen
 import com.example.wdww.viewmodel.SharedViewModel
+import com.example.wdww.viewmodel.AuthViewModel
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.navigation.NavController
 
 @Composable
 fun NavigationHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    authViewModel: AuthViewModel
 ) {
     NavHost(navController, startDestination = Screen.Trending.route, modifier = modifier) {
         composable(Screen.Trending.route) {
@@ -35,13 +41,25 @@ fun NavigationHost(
             TheatersScreen(sharedViewModel = sharedViewModel)
         }
         composable(Screen.MyMovies.route) {
-            MyMoviesScreen(sharedViewModel = sharedViewModel)
+            MyMoviesScreen(
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
+            )
         }
         composable(Screen.MyTV.route) {
-            MyTVScreen(sharedViewModel = sharedViewModel)
+            MyTVScreen(
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
+            )
         }
         composable(Screen.MyAlerts.route) {
             MyAlertsScreen(sharedViewModel = sharedViewModel)
+        }
+        composable("search") {
+            SearchScreen(
+                sharedViewModel = sharedViewModel,
+                navController = navController
+            )
         }
     }
 }

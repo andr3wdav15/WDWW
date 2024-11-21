@@ -6,12 +6,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.navigation.compose.*
 import kotlinx.coroutines.launch
 import com.example.wdww.components.*
@@ -19,6 +23,7 @@ import com.example.wdww.screens.*
 import com.example.wdww.ui.theme.WDWWTheme
 import com.example.wdww.viewmodel.AuthViewModel
 import com.example.wdww.viewmodel.SharedViewModel
+import androidx.navigation.NavController
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
@@ -77,57 +82,67 @@ fun MainContent(
     val scope = rememberCoroutineScope()
     val searchQuery by sharedViewModel.searchQuery.collectAsState()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            NavigationDrawer(
-                isOpen = drawerState.isOpen,
-                onClose = { 
-                    scope.launch { drawerState.close() }
-                },
-                onNavigate = { screen ->
-                    navController.navigate(screen.route) {
-                        popUpTo(Screen.Trending.route) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
                     }
-                    scope.launch { drawerState.close() }
-                },
-                onLogout = {
-                    authViewModel.logout()
-                }
-            )
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                SearchBar(
-                    onMenuClick = { 
-                        scope.launch { drawerState.open() }
-                    },
-                    onSearchTextChanged = { sharedViewModel.updateSearchQuery(it) },
-                    searchTextState = searchQuery,
-                    focusRequester = focusRequester
                 )
-            },
-            bottomBar = {
-                BottomNavigationBar(navController = navController)
             }
-        ) { paddingValues ->
-            NavHost(
-                navController = navController,
-                startDestination = Screen.Trending.route,
-                modifier = Modifier.padding(paddingValues)
-            ) {
-                composable(Screen.Trending.route) { TrendingScreen(sharedViewModel) }
-                composable(Screen.Movies.route) { MoviesScreen(sharedViewModel) }
-                composable(Screen.TVShows.route) { TVShowsScreen(sharedViewModel) }
-                composable(Screen.Theaters.route) { TheatersScreen(sharedViewModel) }
-                composable(Screen.MyMovies.route) { MyMoviesScreen(sharedViewModel) }
-                composable(Screen.MyTV.route) { MyTVScreen(sharedViewModel) }
-                composable(Screen.MyAlerts.route) { MyAlertsScreen(sharedViewModel) }
+    ) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                NavigationDrawer(
+                    isOpen = drawerState.isOpen,
+                    onClose = { 
+                        scope.launch { drawerState.close() }
+                    },
+                    onNavigate = { screen ->
+                        navController.navigate(screen.route) {
+                            popUpTo(Screen.Trending.route) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                        scope.launch { drawerState.close() }
+                    },
+                    onLogout = {
+                        authViewModel.logout()
+                    }
+                )
+            }
+        ) {
+            Scaffold(
+                topBar = {
+                    SearchBar(
+                        onMenuClick = { 
+                            scope.launch { drawerState.open() }
+                        },
+                        onSearchTextChanged = { sharedViewModel.updateSearchQuery(it) },
+                        searchTextState = searchQuery,
+                        focusRequester = focusRequester,
+                        navController = navController
+                    )
+                },
+                bottomBar = {
+                    BottomNavigationBar(navController = navController)
+                }
+            ) { paddingValues ->
+                Box(
+                    modifier = Modifier.padding(paddingValues)
+                ) {
+                    NavigationHost(
+                        navController = navController,
+                        sharedViewModel = sharedViewModel,
+                        authViewModel = authViewModel
+                    )
+                }
             }
         }
     }
