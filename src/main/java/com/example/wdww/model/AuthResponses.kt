@@ -1,4 +1,4 @@
-package com.example.wdww.model.auth
+package com.example.wdww.model
 
 import com.google.gson.annotations.SerializedName
 

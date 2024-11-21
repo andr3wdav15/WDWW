@@ -1,10 +1,10 @@
 package com.example.wdww.network
 
-import com.example.wdww.model.auth.CreateSessionRequest
-import com.example.wdww.model.auth.CreateSessionResponse
-import com.example.wdww.model.auth.DeleteSessionRequest
-import com.example.wdww.model.auth.DeleteSessionResponse
-import com.example.wdww.model.auth.RequestTokenResponse
+import com.example.wdww.model.CreateSessionRequest
+import com.example.wdww.model.CreateSessionResponse
+import com.example.wdww.model.DeleteSessionRequest
+import com.example.wdww.model.DeleteSessionResponse
+import com.example.wdww.model.RequestTokenResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

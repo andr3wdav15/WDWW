@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wdww.auth.AuthManager
-import com.example.wdww.model.auth.CreateSessionRequest
+import com.example.wdww.model.CreateSessionRequest
 import com.example.wdww.network.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
