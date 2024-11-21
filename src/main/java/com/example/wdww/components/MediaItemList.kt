@@ -28,7 +28,6 @@ fun MediaItemList(
 ) {
     val listState = rememberLazyListState()
 
-    // Trigger load more when reaching near the end
     LaunchedEffect(listState) {
         snapshotFlow {
             listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index

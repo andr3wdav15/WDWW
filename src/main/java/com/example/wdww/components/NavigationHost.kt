@@ -16,9 +16,6 @@ import com.example.wdww.screens.MyAlertsScreen
 import com.example.wdww.screens.SearchScreen
 import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.navigation.NavController
 
 @Composable
 fun NavigationHost(

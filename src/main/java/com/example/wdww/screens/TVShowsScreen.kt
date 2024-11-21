@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TVShowsScreen(sharedViewModel: SharedViewModel) {
-    val pagerState = rememberPagerState { 5 }  // Number of pages
+    val pagerState = rememberPagerState { 5 }
     val coroutineScope = rememberCoroutineScope()
     val pages = listOf(
         "All", 
@@ -29,7 +29,7 @@ fun TVShowsScreen(sharedViewModel: SharedViewModel) {
     Column(modifier = Modifier.fillMaxSize()) {
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
-            edgePadding = 0.dp  // Remove extra padding at edges
+            edgePadding = 0.dp
         ) {
             pages.forEachIndexed { index, title ->
                 Tab(
@@ -52,7 +52,7 @@ fun TVShowsScreen(sharedViewModel: SharedViewModel) {
                 0 -> PopularTVContent(sharedViewModel)
                 1 -> StreamingServiceTVContent(sharedViewModel, "Netflix", "8")
                 2 -> StreamingServiceTVContent(sharedViewModel, "Disney+", "337")
-                3 -> StreamingServiceTVContent(sharedViewModel, "Apple TV+", "350")
+                3 -> StreamingServiceTVContent(sharedViewModel, "Apple TV", "350")
                 4 -> StreamingServiceTVContent(sharedViewModel, "Crave", "230")
             }
         }
@@ -98,7 +98,7 @@ private fun PopularTVContent(sharedViewModel: SharedViewModel) {
         if (allMediaItems.isNotEmpty()) {
             MediaItemList(
                 mediaItems = allMediaItems,
-                headerTitle = "Popular TV",
+                headerTitle = "Popular",
                 showGenre = true,
                 onLoadMore = {
                     if (!isLoading && hasMorePages) {
@@ -193,7 +193,7 @@ private fun StreamingServiceTVContent(
         if (allMediaItems.isNotEmpty()) {
             MediaItemList(
                 mediaItems = allMediaItems,
-                headerTitle = "$serviceName",
+                headerTitle = serviceName,
                 showGenre = true,
                 onLoadMore = {
                     if (!isLoading && hasMorePages) {

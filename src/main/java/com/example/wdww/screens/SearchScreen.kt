@@ -3,7 +3,6 @@ package com.example.wdww.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,11 +31,10 @@ fun SearchScreen(
     val coroutineScope = rememberCoroutineScope()
     val searchQuery by sharedViewModel.searchQuery.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
-    
-    // Debounced search
+
     LaunchedEffect(searchQuery) {
-        if (searchQuery.length >= 2) {  // Only search if 2 or more characters
-            delay(300)  // Wait 300ms after last keystroke
+        if (searchQuery.length >= 2) {
+            delay(300)
             try {
                 isLoading = true
                 currentPage = 1
@@ -63,7 +61,6 @@ fun SearchScreen(
                 isLoading = false
             }
         } else {
-            // Clear results if search query is too short
             allMediaItems.clear()
         }
     }

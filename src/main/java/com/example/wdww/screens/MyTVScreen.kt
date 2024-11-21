@@ -11,7 +11,6 @@ import com.example.wdww.model.MediaItem
 import com.example.wdww.network.RetrofitInstance
 import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun MyTVScreen(
@@ -22,7 +21,6 @@ fun MyTVScreen(
     var error by remember { mutableStateOf<String?>(null) }
     var accountId by remember { mutableStateOf<Int?>(null) }
 
-    // Get account details first
     LaunchedEffect(Unit) {
         try {
             val sessionId = authViewModel.getSessionId()
@@ -40,7 +38,6 @@ fun MyTVScreen(
         }
     }
 
-    // Load favorite TV shows
     LaunchedEffect(accountId) {
         if (accountId != null && allMediaItems.isEmpty()) {
             try {
@@ -72,7 +69,9 @@ fun MyTVScreen(
                 mediaItems = allMediaItems,
                 headerTitle = "My TV Shows",
                 showGenre = true,
-                onLoadMore = { /* No pagination for favorites */ },
+                onLoadMore = {
+                    // Not implemented for TV shows
+                },
                 showLoadingIndicator = false
             )
         } else if (error == null) {

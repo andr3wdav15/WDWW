@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MoviesScreen(sharedViewModel: SharedViewModel) {
-    val pagerState = rememberPagerState { 6 }  // Number of pages
+    val pagerState = rememberPagerState { 6 }
     val coroutineScope = rememberCoroutineScope()
     val pages = listOf(
         "All", 
@@ -30,7 +30,7 @@ fun MoviesScreen(sharedViewModel: SharedViewModel) {
     Column(modifier = Modifier.fillMaxSize()) {
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
-            edgePadding = 0.dp  // Remove extra padding at edges
+            edgePadding = 0.dp
         ) {
             pages.forEachIndexed { index, title ->
                 Tab(
@@ -70,7 +70,6 @@ private fun PopularMoviesContent(sharedViewModel: SharedViewModel) {
     var error by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Load initial data
     LaunchedEffect(Unit) {
         if (allMediaItems.isEmpty()) {
             try {
@@ -196,7 +195,7 @@ private fun StreamingServiceMoviesContent(
         if (allMediaItems.isNotEmpty()) {
             MediaItemList(
                 mediaItems = allMediaItems,
-                headerTitle = "$serviceName",
+                headerTitle = serviceName,
                 showGenre = true,
                 onLoadMore = {
                     if (!isLoading && hasMorePages) {

@@ -23,7 +23,6 @@ import com.example.wdww.screens.*
 import com.example.wdww.ui.theme.WDWWTheme
 import com.example.wdww.viewmodel.AuthViewModel
 import com.example.wdww.viewmodel.SharedViewModel
-import androidx.navigation.NavController
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()

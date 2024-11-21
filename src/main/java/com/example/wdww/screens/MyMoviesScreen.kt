@@ -11,7 +11,6 @@ import com.example.wdww.model.MediaItem
 import com.example.wdww.network.RetrofitInstance
 import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun MyMoviesScreen(
@@ -22,7 +21,6 @@ fun MyMoviesScreen(
     var error by remember { mutableStateOf<String?>(null) }
     var accountId by remember { mutableStateOf<Int?>(null) }
 
-    // Get account details first
     LaunchedEffect(Unit) {
         try {
             val sessionId = authViewModel.getSessionId()
@@ -40,7 +38,6 @@ fun MyMoviesScreen(
         }
     }
 
-    // Load favorite movies
     LaunchedEffect(accountId) {
         if (accountId != null && allMediaItems.isEmpty()) {
             try {

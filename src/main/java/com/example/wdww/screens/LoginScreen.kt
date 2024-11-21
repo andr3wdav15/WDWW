@@ -91,7 +91,7 @@ fun LoginScreen(
             }
             
             is AuthState.Authenticated -> {
-                // Handled by LaunchedEffect above
+                onAuthSuccess()
             }
         }
     }

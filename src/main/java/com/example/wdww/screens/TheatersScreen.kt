@@ -161,7 +161,6 @@ private fun NowPlayingContent(sharedViewModel: SharedViewModel) {
     var error by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Load initial data
     LaunchedEffect(Unit) {
         if (allMediaItems.isEmpty()) {
             try {
