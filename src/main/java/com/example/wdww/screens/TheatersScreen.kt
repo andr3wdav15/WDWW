@@ -8,37 +8,72 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalConfiguration
+import android.content.res.Configuration
 import com.example.wdww.components.MediaItemList
 import com.example.wdww.model.MediaItem
 import com.example.wdww.network.RetrofitInstance
+import com.example.wdww.viewmodel.AuthViewModel
 import com.example.wdww.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import com.example.wdww.viewmodel.AuthViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TheatersScreen(
     sharedViewModel: SharedViewModel,
     authViewModel: AuthViewModel
 ) {
-    val pagerState = rememberPagerState(pageCount = { 2 })
+    val pagerState = rememberPagerState { 2 }
     val coroutineScope = rememberCoroutineScope()
-    val pages = listOf("Coming Soon", "Now Playing")
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    
+    val pages = listOf(
+        "Coming Soon",
+        "Now Playing"
+    )
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(
-            selectedTabIndex = pagerState.currentPage
-        ) {
-            pages.forEachIndexed { index, title ->
-                Tab(
-                    text = { Text(title) },
-                    selected = pagerState.currentPage == index,
-                    onClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                start = if (!isPortrait) 64.dp else 0.dp,
+                end = if (!isPortrait) 64.dp else 0.dp,
+                top = if (!isPortrait) 24.dp else 0.dp
+            )
+    ) {
+        if (isPortrait) {
+            TabRow(
+                selectedTabIndex = pagerState.currentPage
+            ) {
+                pages.forEachIndexed { index, title ->
+                    Tab(
+                        text = { Text(title) },
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
                         }
-                    }
-                )
+                    )
+                }
+            }
+        } else {
+            TabRow(
+                selectedTabIndex = pagerState.currentPage
+            ) {
+                pages.forEachIndexed { index, title ->
+                    Tab(
+                        text = { Text(title) },
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        }
+                    )
+                }
             }
         }
 
@@ -82,7 +117,7 @@ private fun UpcomingMoviesContent(
                         val upcomingMovies = upcomingResponse.results.filter { movie ->
                             movie.releaseDate?.let { releaseDate ->
                                 LocalDate.parse(releaseDate).isAfter(today)
-                            } ?: false
+                            } == true
                         }
                         allMediaItems.addAll(upcomingMovies)
                         hasMorePages = currentPage < upcomingResponse.totalPages

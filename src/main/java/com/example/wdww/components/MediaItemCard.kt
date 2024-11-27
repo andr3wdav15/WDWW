@@ -1,6 +1,7 @@
 package com.example.wdww.components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -17,28 +18,30 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.wdww.model.MediaItem
-import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
-import kotlinx.coroutines.launch
+import com.example.wdww.viewmodel.SharedViewModel
 
 @SuppressLint("DefaultLocale")
 @Composable
 fun MediaItemCard(
     mediaItem: MediaItem,
     showGenre: Boolean = false,
+    showTypeWithGenre: Boolean = false,
     isFavoritesList: Boolean = false,
     sharedViewModel: SharedViewModel,
     authViewModel: AuthViewModel
 ) {
     var showModal by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    val accountId by authViewModel.accountId.collectAsState()
+    rememberCoroutineScope()
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { showModal = true },
+            .clickable {
+                Log.d("MediaItemCard", "Card clicked: ${mediaItem.name ?: mediaItem.title} (ID: ${mediaItem.id}, Type: ${mediaItem.mediaType})")
+                showModal = true
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RectangleShape
     ) {
@@ -93,11 +96,24 @@ fun MediaItemCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Media Type or Genre
+                    // Media Type and Genre
                     Text(
                         text = if (showGenre && !mediaItem.genreIds.isNullOrEmpty()) {
-                            mediaItem.genreIds.take(2).map { getGenreName(it) }.joinToString(" • ")
+                            if (showTypeWithGenre) {
+                                // For trending screen, show type and first genre
+                                val type = when (mediaItem.mediaType?.lowercase()) {
+                                    "tv" -> "TV"
+                                    "movie" -> "Movie"
+                                    else -> "Unknown"
+                                }
+                                val genre = mediaItem.genreIds.take(1).map { getGenreName(it) }.first()
+                                "$type • $genre"
+                            } else {
+                                // For other screens, show two genres
+                                mediaItem.genreIds.take(2).map { getGenreName(it) }.joinToString(" • ")
+                            }
                         } else {
+                            // For screens without genres, show only type
                             when (mediaItem.mediaType?.lowercase()) {
                                 "tv" -> "TV"
                                 "movie" -> "Movie"
@@ -136,11 +152,10 @@ fun MediaItemCard(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = mediaItem.overview ?: "",
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = mediaItem.overview?.takeIf { it.isNotBlank() } ?: "Overview not available",
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

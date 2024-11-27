@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.wdww.components.MediaItemList
+import com.example.wdww.components.FullscreenMediaPager
 import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
 
@@ -35,15 +35,10 @@ fun MyMoviesScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (favoriteMovies.isNotEmpty()) {
-            MediaItemList(
+            FullscreenMediaPager(
                 mediaItems = favoriteMovies,
-                headerTitle = "My Movies",
-                showGenre = true,
-                onLoadMore = { /* No pagination for favorites */ },
-                showLoadingIndicator = false,
-                isFavoritesList = true,
-                authViewModel = authViewModel,
-                sharedViewModel = sharedViewModel
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         } else if (error == null) {
             Text(

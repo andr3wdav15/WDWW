@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.wdww.Screen
+import androidx.compose.material.icons.filled.BarChart
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -26,19 +27,19 @@ fun BottomNavigationBar(navController: NavController) {
                 icon = {
                     when (screen) {
                         Screen.Trending -> Icon(
-                            Icons.Default.Star,
+                            Icons.Default.BarChart,
                             contentDescription = screen.title
                         )
                         Screen.Movies -> Icon(
-                            Icons.Default.Star,
+                            Icons.Default.Movie,
                             contentDescription = screen.title
                         )
                         Screen.TVShows -> Icon(
-                            Icons.Default.Star,
+                            Icons.Default.Tv,
                             contentDescription = screen.title
                         )
                         Screen.Theaters -> Icon(
-                            Icons.Default.Star,
+                            Icons.Default.Theaters,
                             contentDescription = screen.title
                         )
                         else -> Icon(
@@ -57,7 +58,12 @@ fun BottomNavigationBar(navController: NavController) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                    indicatorColor = MaterialTheme.colorScheme.primary
+                )
             )
         }
     }

@@ -7,9 +7,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.wdww.components.MediaItemList
+import com.example.wdww.components.FullscreenMediaPager
 import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
+import android.util.Log
 
 @Composable
 fun MyTVShowsScreen(
@@ -23,6 +24,7 @@ fun MyTVShowsScreen(
     LaunchedEffect(accountId) {
         accountId?.let { id ->
             authViewModel.getSessionId()?.let { sessionId ->
+                Log.d("MyTVShowsScreen", "Refreshing favorite TV shows for account: $id")
                 sharedViewModel.refreshFavoriteTVShows(id, sessionId)
             }
         }
@@ -30,15 +32,14 @@ fun MyTVShowsScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (favoriteTVShows.isNotEmpty()) {
-            MediaItemList(
+            Log.d("MyTVShowsScreen", "Displaying ${favoriteTVShows.size} favorite TV shows")
+            favoriteTVShows.forEach { show ->
+                Log.d("MyTVShowsScreen", "TV Show: ${show.name ?: show.title} (ID: ${show.id}, Type: ${show.mediaType})")
+            }
+            FullscreenMediaPager(
                 mediaItems = favoriteTVShows,
-                headerTitle = "My TV Shows",
-                showGenre = true,
-                onLoadMore = { /* No pagination for favorites */ },
-                showLoadingIndicator = false,
-                isFavoritesList = true,
-                authViewModel = authViewModel,
-                sharedViewModel = sharedViewModel
+                sharedViewModel = sharedViewModel,
+                authViewModel = authViewModel
             )
         } else if (error == null) {
             Text(

@@ -49,13 +49,25 @@ fun LoginScreen(
     ) {
         when (val state = authState) {
             is AuthState.Initial -> {
-                Button(onClick = { authViewModel.startAuth() }) {
+                Text(
+                    text = "Welcome to WDWW",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+                Button(
+                    onClick = { authViewModel.startAuth() },
+                    modifier = Modifier.padding(vertical = 8.dp)
+                ) {
                     Text("Login with TMDB")
                 }
             }
             
             is AuthState.Loading -> {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
             
             is AuthState.RequiresUserAuth -> {
@@ -68,11 +80,14 @@ fun LoginScreen(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         "Authenticating with TMDB...",
                         style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -85,7 +100,10 @@ fun LoginScreen(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                Button(onClick = { authViewModel.startAuth() }) {
+                Button(
+                    onClick = { authViewModel.startAuth() },
+                    modifier = Modifier.padding(vertical = 8.dp)
+                ) {
                     Text("Retry")
                 }
             }

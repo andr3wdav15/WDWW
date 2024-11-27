@@ -13,9 +13,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import android.content.res.Configuration
 import com.example.wdww.model.MediaItem
 import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
@@ -25,6 +26,7 @@ fun MediaItemList(
     mediaItems: List<MediaItem>,
     headerTitle: String = "",
     showGenre: Boolean = false,
+    showTypeWithGenre: Boolean = false,
     onLoadMore: () -> Unit = {},
     showHeader: Boolean = true,
     showLoadingIndicator: Boolean = false,
@@ -33,6 +35,9 @@ fun MediaItemList(
     authViewModel: AuthViewModel
 ) {
     val listState = rememberLazyListState()
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    val horizontalPadding = if (!isPortrait) 64.dp else 16.dp
 
     LaunchedEffect(listState) {
         snapshotFlow {
@@ -52,16 +57,18 @@ fun MediaItemList(
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(
-            top = if (showHeader) 16.dp else 0.dp,
-            bottom = 16.dp
-        )
+            horizontal = horizontalPadding,
+            vertical = 24.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        if (showHeader) {
+        if (showHeader && headerTitle.isNotEmpty()) {
             item {
                 Text(
                     text = headerTitle,
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
         }
@@ -70,6 +77,7 @@ fun MediaItemList(
             MediaItemCard(
                 mediaItem = mediaItem,
                 showGenre = showGenre,
+                showTypeWithGenre = showTypeWithGenre,
                 isFavoritesList = isFavoritesList,
                 sharedViewModel = sharedViewModel,
                 authViewModel = authViewModel

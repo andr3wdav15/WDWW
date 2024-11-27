@@ -11,7 +11,7 @@ import com.example.wdww.screens.TVShowsScreen
 import com.example.wdww.screens.TheatersScreen
 import com.example.wdww.screens.TrendingScreen
 import com.example.wdww.screens.MyMoviesScreen
-import com.example.wdww.screens.MyTVScreen
+import com.example.wdww.screens.MyTVShowsScreen
 import com.example.wdww.screens.MyAlertsScreen
 import com.example.wdww.screens.SearchScreen
 import com.example.wdww.viewmodel.SharedViewModel
@@ -56,7 +56,7 @@ fun NavigationHost(
             )
         }
         composable(Screen.MyTV.route) {
-            MyTVScreen(
+            MyTVShowsScreen(
                 sharedViewModel = sharedViewModel,
                 authViewModel = authViewModel
             )

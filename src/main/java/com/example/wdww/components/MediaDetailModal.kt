@@ -1,5 +1,6 @@
 package com.example.wdww.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,7 +31,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Notifications
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,24 +44,12 @@ fun MediaDetailModal(
 ) {
     val mediaDetails by sharedViewModel.selectedMediaDetails.collectAsState()
     val accountId by authViewModel.accountId.collectAsState()
-    val alerts by sharedViewModel.alerts.collectAsState()
     val favoriteMovies by sharedViewModel.favoriteMovies.collectAsState()
     val favoriteTVShows by sharedViewModel.favoriteTVShows.collectAsState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    
-    // Check if the media is in favorites - if we're in favorites list, we know it's true
-    // otherwise check the lists
-    val isFavorite = remember(mediaItem, favoriteMovies, favoriteTVShows, isFavoritesList) {
-        if (isFavoritesList) true
-        else {
-            when (mediaItem.mediaType) {
-                "movie" -> favoriteMovies.any { it.id == mediaItem.id }
-                "tv" -> favoriteTVShows.any { it.id == mediaItem.id }
-                else -> false
-            }
-        }
-    }
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     
     // Check if the media is an upcoming release
     val isUpcoming = remember(mediaItem) {
@@ -68,16 +58,95 @@ fun MediaDetailModal(
         } ?: mediaItem.firstAirDate?.let {
             LocalDate.parse(it)
         }
-        
+
         releaseDate?.isAfter(LocalDate.now()) ?: false
     }
 
-    LaunchedEffect(mediaItem.id) {
-        sharedViewModel.fetchMediaDetails(mediaItem.id, mediaItem.mediaType ?: "movie")
+    // Get favorite status - check both movie and TV show lists
+    val isFavorite by remember(mediaItem.id, favoriteMovies, favoriteTVShows) {
+        derivedStateOf {
+            when {
+                // If we're in the favorites list, it's definitely a favorite
+                isFavoritesList -> true
+                // Check if it's in the TV shows list
+                mediaItem.mediaType == "tv" -> favoriteTVShows.any { it.id == mediaItem.id }
+                // Otherwise check both lists
+                else -> favoriteMovies.any { it.id == mediaItem.id } || 
+                        favoriteTVShows.any { it.id == mediaItem.id }
+            }
+        }
+    }
+
+    // Handle favorite toggle
+    val handleFavoriteToggle: () -> Unit = {
+        Log.d("MediaDetailModal", "Toggling favorite status for ID: ${mediaItem.id}")
+        accountId?.let { id ->
+            scope.launch {
+                authViewModel.getSessionId()?.let { sessionId ->
+                    // Determine media type
+                    val mediaType = when {
+                        // If we're in favorites list and in MyTVShows screen, it's definitely a TV show
+                        isFavoritesList && mediaItem.mediaType == "tv" -> "tv"
+                        // If mediaType is explicitly set to tv, use it
+                        mediaItem.mediaType == "tv" -> "tv"
+                        // If it has a name but no title, it's likely a TV show
+                        mediaItem.title == null && mediaItem.name != null -> "tv"
+                        // If we're in favorites list and it has a name, assume it's a TV show
+                        isFavoritesList && mediaItem.name != null -> "tv"
+                        // Default to movie
+                        else -> "movie"
+                    }
+                    Log.d("MediaDetailModal", "Using type: $mediaType for favorite toggle")
+
+                    if (isFavorite) {
+                        // Remove from favorites and wait for UI update
+                        sharedViewModel.removeFromFavorites(
+                            mediaId = mediaItem.id,
+                            mediaType = mediaType,
+                            accountId = id,
+                            sessionId = sessionId
+                        )
+                        // If we're in favorites list and removing a favorite, dismiss the modal
+                        if (isFavoritesList) {
+                            onDismiss()
+                        }
+                    } else {
+                        sharedViewModel.addToFavorites(
+                            mediaId = mediaItem.id,
+                            mediaType = mediaType,
+                            accountId = id,
+                            sessionId = sessionId
+                        )
+                    }
+
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(mediaItem.id, mediaItem.mediaType) {
+        Log.d("MediaDetailModal", "Opening modal for: ${mediaItem.title ?: mediaItem.name} (ID: ${mediaItem.id}, Type: ${mediaItem.mediaType})")
+        
+        // Determine the media type
+        val type = when {
+            // If we're in favorites list and it has a name (TV show title), it's a TV show
+            isFavoritesList && mediaItem.name != null -> "tv"
+            // If mediaType is explicitly set, use it
+            !mediaItem.mediaType.isNullOrEmpty() -> mediaItem.mediaType
+            // If it has a name but no title, it's likely a TV show
+            mediaItem.title == null && mediaItem.name != null -> "tv"
+            // Default to movie
+            else -> "movie"
+        }
+        
+        Log.d("MediaDetailModal", "Using type: $type for API call with ID: ${mediaItem.id}")
+        sharedViewModel.fetchMediaDetails(mediaItem.id, type)
     }
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = isLandscape),
+        modifier = if (isLandscape) Modifier.fillMaxSize() else Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
@@ -122,34 +191,47 @@ fun MediaDetailModal(
                     )
                     
                     if (isUpcoming) {
+                        val alerts by sharedViewModel.alerts.collectAsState()
+                        val isAlertSet = alerts.any { it.mediaId == mediaItem.id }
+                        
                         IconButton(
                             onClick = {
-                                if (sharedViewModel.isAlertSet(mediaItem.id)) {
-                                    sharedViewModel.removeAlert(context, mediaItem.id)
+                                if (isAlertSet) {
+                                    scope.launch {
+                                        sharedViewModel.removeAlert(context, mediaItem.id)
+                                        // Also remove from theatre list if we have a session
+                                        authViewModel.getSessionId()?.let { sessionId ->
+                                            sharedViewModel.removeFromTheatreList(mediaItem.id, sessionId)
+                                        }
+                                    }
                                 } else {
-                                    sharedViewModel.addAlert(
-                                        context = context,
-                                        movieId = mediaItem.id,
-                                        movieTitle = mediaItem.title ?: mediaItem.name ?: "",
-                                        releaseDate = mediaItem.releaseDate ?: mediaItem.firstAirDate ?: "",
-                                        posterPath = mediaItem.posterPath,
-                                        mediaType = mediaItem.mediaType ?: "movie"
-                                    )
+                                    scope.launch {
+                                        val sessionId = authViewModel.getSessionId()
+                                        sharedViewModel.addAlert(
+                                            context = context,
+                                            movieId = mediaItem.id,
+                                            movieTitle = mediaItem.title ?: mediaItem.name ?: "",
+                                            releaseDate = mediaItem.releaseDate ?: mediaItem.firstAirDate ?: "",
+                                            posterPath = mediaItem.posterPath,
+                                            mediaType = mediaItem.mediaType ?: "movie",
+                                            sessionId = sessionId
+                                        )
+                                    }
                                 }
                             }
                         ) {
                             Icon(
-                                imageVector = if (sharedViewModel.isAlertSet(mediaItem.id)) {
+                                imageVector = if (isAlertSet) {
                                     Icons.Filled.Notifications
                                 } else {
                                     Icons.Outlined.Notifications
                                 },
-                                contentDescription = if (sharedViewModel.isAlertSet(mediaItem.id)) {
+                                contentDescription = if (isAlertSet) {
                                     "Remove Alert"
                                 } else {
                                     "Set Alert"
                                 },
-                                tint = if (sharedViewModel.isAlertSet(mediaItem.id)) {
+                                tint = if (isAlertSet) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
                                     MaterialTheme.colorScheme.onSurface
@@ -159,29 +241,7 @@ fun MediaDetailModal(
                     } else {
                         // Show heart icon for non-upcoming releases
                         IconButton(
-                            onClick = {
-                                scope.launch {
-                                    accountId?.let { id ->
-                                        authViewModel.getSessionId()?.let { sessionId ->
-                                            if (isFavorite) {
-                                                sharedViewModel.removeFromFavorites(
-                                                    mediaId = mediaItem.id,
-                                                    mediaType = mediaItem.mediaType ?: "movie",
-                                                    accountId = id,
-                                                    sessionId = sessionId
-                                                )
-                                            } else {
-                                                sharedViewModel.addToFavorites(
-                                                    mediaId = mediaItem.id,
-                                                    mediaType = mediaItem.mediaType ?: "movie",
-                                                    accountId = id,
-                                                    sessionId = sessionId
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            onClick = handleFavoriteToggle
                         ) {
                             Icon(
                                 imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
@@ -224,8 +284,8 @@ fun MediaDetailModal(
 
                 // Overview
                 Text(
-                    text = mediaDetails?.overview ?: "",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = mediaDetails?.overview?.takeIf { it.isNotBlank() } ?: "Overview not available",
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 

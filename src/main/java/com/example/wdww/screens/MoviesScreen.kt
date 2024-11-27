@@ -8,6 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalConfiguration
+import android.content.res.Configuration
 import com.example.wdww.components.MediaItemList
 import com.example.wdww.model.MediaItem
 import com.example.wdww.network.RetrofitInstance
@@ -19,6 +21,9 @@ import kotlinx.coroutines.launch
 fun MoviesScreen(sharedViewModel: SharedViewModel, authViewModel: AuthViewModel) {
     val pagerState = rememberPagerState { 6 }
     val coroutineScope = rememberCoroutineScope()
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    
     val pages = listOf(
         "All",
         "Netflix",
@@ -28,21 +33,47 @@ fun MoviesScreen(sharedViewModel: SharedViewModel, authViewModel: AuthViewModel)
         "Paramount+"
     )
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        ScrollableTabRow(
-            selectedTabIndex = pagerState.currentPage,
-            edgePadding = 0.dp
-        ) {
-            pages.forEachIndexed { index, title ->
-                Tab(
-                    text = { Text(title) },
-                    selected = pagerState.currentPage == index,
-                    onClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                start = if (!isPortrait) 64.dp else 0.dp,
+                end = if (!isPortrait) 64.dp else 0.dp,
+                top = if (!isPortrait) 24.dp else 0.dp
+            )
+    ) {
+        if (isPortrait) {
+            ScrollableTabRow(
+                selectedTabIndex = pagerState.currentPage,
+                edgePadding = 0.dp
+            ) {
+                pages.forEachIndexed { index, title ->
+                    Tab(
+                        text = { Text(title) },
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
                         }
-                    }
-                )
+                    )
+                }
+            }
+        } else {
+            TabRow(
+                selectedTabIndex = pagerState.currentPage
+            ) {
+                pages.forEachIndexed { index, title ->
+                    Tab(
+                        text = { Text(title) },
+                        selected = pagerState.currentPage == index,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        }
+                    )
+                }
             }
         }
 

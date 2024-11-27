@@ -1,101 +1,128 @@
 package com.example.wdww.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.wdww.components.MediaCard
-import com.example.wdww.components.MediaDetailModal
+import com.example.wdww.components.FullscreenMediaPager
 import com.example.wdww.model.MediaItem
 import com.example.wdww.viewmodel.AuthViewModel
 import com.example.wdww.viewmodel.SharedViewModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyAlertsScreen(
     sharedViewModel: SharedViewModel,
     authViewModel: AuthViewModel
 ) {
     val alerts by sharedViewModel.alerts.collectAsState()
-    var selectedMedia by remember { mutableStateOf<MediaItem?>(null) }
+    val error by sharedViewModel.error.collectAsState()
+    val accountId by authViewModel.accountId.collectAsState()
+    var isLoading by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "My Alerts",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        if (alerts.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "No alerts set. Add alerts for upcoming movies to see them here!",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 140.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(alerts.sortedBy { it.releaseDate }) { alert ->
-                    val releaseDate = try {
-                        LocalDate.parse(alert.releaseDate, DateTimeFormatter.ISO_DATE)
-                    } catch (e: Exception) {
-                        null
-                    }
-                    
-                    MediaCard(
-                        mediaItem = MediaItem(
-                            id = alert.mediaId,
-                            title = alert.title,
-                            name = null,
-                            overview = null,
-                            posterPath = alert.posterPath,
-                            releaseDate = alert.releaseDate,
-                            firstAirDate = null,
-                            mediaType = alert.mediaType,
-                            voteAverage = null,
-                            genreIds = null
-                        ),
-                        onClick = { selectedMedia = it },
-                        badge = releaseDate?.let { date ->
-                            val daysUntil = LocalDate.now().until(date).days
-                            when {
-                                daysUntil > 1 -> "$daysUntil days"
-                                daysUntil == 1 -> "Tomorrow"
-                                daysUntil == 0 -> "Today"
-                                else -> null
-                            }
-                        }
-                    )
-                }
-            }
+    // Debug logging
+    LaunchedEffect(alerts) {
+        Log.d("MyAlertsScreen", "Alerts updated: ${alerts.size} items")
+        alerts.forEach { alert ->
+            Log.d("MyAlertsScreen", "Alert: ${alert.title} (${alert.mediaId})")
         }
     }
 
-    selectedMedia?.let { media ->
-        MediaDetailModal(
-            mediaItem = media,
-            onDismiss = { selectedMedia = null },
-            sharedViewModel = sharedViewModel,
-            authViewModel = authViewModel
-        )
+    // Fetch theatre list when screen loads
+    LaunchedEffect(Unit) {
+        Log.d("MyAlertsScreen", "LaunchedEffect triggered")
+        isLoading = true
+        try {
+            val sessionId = authViewModel.getSessionId()
+            Log.d("MyAlertsScreen", "SessionId: $sessionId, AccountId: $accountId")
+            
+            if (sessionId != null && accountId != null) {
+                Log.d("MyAlertsScreen", "Calling getTheatreList")
+                val success = sharedViewModel.getTheatreList(accountId!!, sessionId)
+                Log.d("MyAlertsScreen", "getTheatreList result: $success")
+                
+                if (!success) {
+                    Log.e("MyAlertsScreen", "Failed to get theatre list")
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Failed to get theatre list")
+                    }
+                }
+            } else {
+                Log.e("MyAlertsScreen", "Missing sessionId or accountId")
+                scope.launch {
+                    snackbarHostState.showSnackbar("Please log in to view alerts")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MyAlertsScreen", "Error loading theatre list", e)
+            scope.launch {
+                snackbarHostState.showSnackbar("Error: ${e.localizedMessage}")
+            }
+        } finally {
+            isLoading = false
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else if (alerts.isNotEmpty()) {
+                Log.d("MyAlertsScreen", "Displaying ${alerts.size} alerts")
+                val mediaItems = alerts.sortedBy { it.releaseDate }.map { alert ->
+                    MediaItem(
+                        id = alert.mediaId,
+                        title = alert.title,
+                        name = null,
+                        overview = null,
+                        posterPath = alert.posterPath,
+                        backdropPath = alert.posterPath,
+                        releaseDate = alert.releaseDate,
+                        firstAirDate = null,
+                        mediaType = alert.mediaType,
+                        voteAverage = null,
+                        genreIds = null
+                    )
+                }
+                
+                FullscreenMediaPager(
+                    mediaItems = mediaItems,
+                    sharedViewModel = sharedViewModel,
+                    authViewModel = authViewModel
+                )
+            } else {
+                Log.d("MyAlertsScreen", "No alerts found")
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No alerts found",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+
+            error?.let { errorMessage ->
+                Log.e("MyAlertsScreen", "Showing error: $errorMessage")
+                scope.launch {
+                    snackbarHostState.showSnackbar(errorMessage)
+                }
+            }
+        }
     }
 }
