@@ -68,7 +68,7 @@ fun MediaItemList(
                     text = headerTitle,
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
                 )
             }
         }
