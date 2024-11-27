@@ -19,16 +19,20 @@ import coil.request.ImageRequest
 import com.example.wdww.model.MediaItem
 import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 
 @SuppressLint("DefaultLocale")
 @Composable
 fun MediaItemCard(
     mediaItem: MediaItem,
     showGenre: Boolean = false,
+    isFavoritesList: Boolean = false,
     sharedViewModel: SharedViewModel,
     authViewModel: AuthViewModel
 ) {
     var showModal by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val accountId by authViewModel.accountId.collectAsState()
 
     Card(
         modifier = Modifier
@@ -46,7 +50,13 @@ fun MediaItemCard(
             // Poster Image
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://image.tmdb.org/t/p/w200${mediaItem.posterPath}")
+                    .data(
+                        if (!mediaItem.posterPath.isNullOrEmpty()) {
+                            "https://image.tmdb.org/t/p/w200${mediaItem.posterPath}"
+                        } else {
+                            "https://via.placeholder.com/200x300.png?text=No+Poster"
+                        }
+                    )
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
@@ -59,15 +69,23 @@ fun MediaItemCard(
             // Content
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
+                    .fillMaxHeight()
                     .padding(12.dp)
             ) {
-                Text(
-                    text = mediaItem.title ?: mediaItem.name ?: "",
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Text(
+                        text = mediaItem.title ?: mediaItem.name ?: "",
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -104,12 +122,13 @@ fun MediaItemCard(
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = String.format("%.1f", mediaItem.voteAverage),
-                            style = MaterialTheme.typography.bodySmall
+                            text = String.format("%.1f", mediaItem.voteAverage ?: 0.0),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -132,7 +151,8 @@ fun MediaItemCard(
             mediaItem = mediaItem,
             onDismiss = { showModal = false },
             sharedViewModel = sharedViewModel,
-            authViewModel = authViewModel
+            authViewModel = authViewModel,
+            isFavoritesList = isFavoritesList
         )
     }
 }

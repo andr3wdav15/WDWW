@@ -1,3 +1,5 @@
+package com.example.wdww.model
+
 import com.google.gson.annotations.SerializedName
 
 data class MediaDetails(
@@ -33,4 +35,4 @@ data class Crew(
     val job: String,
     val department: String,
     val profilePath: String?
-) 
+)

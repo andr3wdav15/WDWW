@@ -23,6 +23,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _isAuthenticated = MutableStateFlow(false)
     val isAuthenticated = _isAuthenticated.asStateFlow()
 
+    private val _accountId = MutableStateFlow<Int?>(null)
+    val accountId: StateFlow<Int?> = _accountId.asStateFlow()
+
     private var currentRequestToken: String? = null
 
     init {
@@ -31,6 +34,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 _isAuthenticated.value = !sessionId.isNullOrEmpty()
                 if (_isAuthenticated.value) {
                     _authState.value = AuthState.Authenticated
+                }
+                if (sessionId != null) {
+                    fetchAccountId(sessionId)
+                } else {
+                    _accountId.value = null
                 }
             }
         }
@@ -98,6 +106,17 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     suspend fun getSessionId(): String? {
         return authManager.sessionId.first()
+    }
+
+    private suspend fun fetchAccountId(sessionId: String) {
+        try {
+            val response = RetrofitInstance.api.getAccountDetails(API_KEY, sessionId)
+            if (response.isSuccessful && response.body()?.id != null) {
+                _accountId.value = response.body()?.id
+            }
+        } catch (e: Exception) {
+            Log.e("AuthViewModel", "Error fetching account ID", e)
+        }
     }
 
     companion object {

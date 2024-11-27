@@ -28,6 +28,7 @@ fun MediaItemList(
     onLoadMore: () -> Unit = {},
     showHeader: Boolean = true,
     showLoadingIndicator: Boolean = false,
+    isFavoritesList: Boolean = false,
     sharedViewModel: SharedViewModel,
     authViewModel: AuthViewModel
 ) {
@@ -69,6 +70,7 @@ fun MediaItemList(
             MediaItemCard(
                 mediaItem = mediaItem,
                 showGenre = showGenre,
+                isFavoritesList = isFavoritesList,
                 sharedViewModel = sharedViewModel,
                 authViewModel = authViewModel
             )

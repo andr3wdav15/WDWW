@@ -18,7 +18,6 @@ import androidx.navigation.NavController
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import com.example.wdww.viewmodel.AuthViewModel
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
@@ -36,7 +35,7 @@ fun SearchScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(searchQuery) {
-        if (searchQuery.length >= 2) {
+        if (searchQuery.isNotEmpty() && searchQuery.length >= 2) {
             delay(300)
             try {
                 isLoading = true

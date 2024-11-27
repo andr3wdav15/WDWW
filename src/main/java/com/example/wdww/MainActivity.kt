@@ -28,6 +28,7 @@ import com.example.wdww.viewmodel.AuthViewModel
 import com.example.wdww.viewmodel.SharedViewModel
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.runtime.getValue
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()

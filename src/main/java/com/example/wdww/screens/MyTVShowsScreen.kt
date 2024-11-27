@@ -1,14 +1,9 @@
 package com.example.wdww.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -17,27 +12,27 @@ import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
 
 @Composable
-fun MyMoviesScreen(
+fun MyTVShowsScreen(
     sharedViewModel: SharedViewModel,
     authViewModel: AuthViewModel
 ) {
-    val favoriteMovies by sharedViewModel.favoriteMovies.collectAsState()
+    val favoriteTVShows by sharedViewModel.favoriteTVShows.collectAsState()
     val error by sharedViewModel.error.collectAsState()
     val accountId by authViewModel.accountId.collectAsState()
     
     LaunchedEffect(accountId) {
         accountId?.let { id ->
             authViewModel.getSessionId()?.let { sessionId ->
-                sharedViewModel.refreshFavoriteMovies(id, sessionId)
+                sharedViewModel.refreshFavoriteTVShows(id, sessionId)
             }
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (favoriteMovies.isNotEmpty()) {
+        if (favoriteTVShows.isNotEmpty()) {
             MediaItemList(
-                mediaItems = favoriteMovies,
-                headerTitle = "My Movies",
+                mediaItems = favoriteTVShows,
+                headerTitle = "My TV Shows",
                 showGenre = true,
                 onLoadMore = { /* No pagination for favorites */ },
                 showLoadingIndicator = false,
@@ -47,7 +42,7 @@ fun MyMoviesScreen(
             )
         } else if (error == null) {
             Text(
-                text = "No favorite movies found",
+                text = "No favorite TV shows found",
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(16.dp)
@@ -64,4 +59,4 @@ fun MyMoviesScreen(
             )
         }
     }
-} 
+}

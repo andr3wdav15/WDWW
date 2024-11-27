@@ -1,13 +1,14 @@
 package com.example.wdww.network
 
 import com.example.wdww.model.AccountResponse
+import com.example.wdww.model.MediaDetails
 import com.example.wdww.model.TrendingResponse
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.http.POST
-import retrofit2.http.Body
 
 interface TMDBApiService {
     @GET("trending/all/day")
@@ -111,14 +112,6 @@ interface TMDBApiService {
         @Query("append_to_response") appendToResponse: String = "credits"
     ): Response<MediaDetails>
 
-    @POST("account/{account_id}/favorite")
-    suspend fun addToFavorites(
-        @Path("account_id") accountId: Int,
-        @Query("api_key") apiKey: String,
-        @Query("session_id") sessionId: String,
-        @Body body: AddToFavoritesRequest
-    ): Response<StatusResponse>
-
     @GET("{media_type}/{id}")
     suspend fun getMediaDetails(
         @Path("media_type") mediaType: String,
@@ -126,15 +119,12 @@ interface TMDBApiService {
         @Query("api_key") apiKey: String,
         @Query("append_to_response") appendToResponse: String
     ): Response<MediaDetails>
+
+    @POST("account/{account_id}/favorite")
+    suspend fun addToFavorites(
+        @Path("account_id") accountId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("session_id") sessionId: String,
+        @Body body: AddToFavoritesRequest
+    ): Response<StatusResponse>
 }
-
-data class AddToFavoritesRequest(
-    val mediaType: String, // "movie" or "tv"
-    val mediaId: Int,
-    val favorite: Boolean
-)
-
-data class StatusResponse(
-    val statusCode: Int,
-    val statusMessage: String
-)
