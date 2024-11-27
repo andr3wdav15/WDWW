@@ -86,7 +86,11 @@ private fun PopularTVContent(
                 
                 if (response.isSuccessful) {
                     response.body()?.let { tvShowsResponse ->
-                        allMediaItems.addAll(tvShowsResponse.results)
+                        // Ensure each item has the correct mediaType
+                        val mappedResults = tvShowsResponse.results.map { item ->
+                            item.copy(mediaType = "tv")
+                        }
+                        allMediaItems.addAll(mappedResults)
                         hasMorePages = currentPage < tvShowsResponse.totalPages
                         currentPage++
                     }
@@ -119,7 +123,11 @@ private fun PopularTVContent(
                                 
                                 if (response.isSuccessful) {
                                     response.body()?.let { tvShowsResponse ->
-                                        allMediaItems.addAll(tvShowsResponse.results)
+                                        // Ensure each item has the correct mediaType
+                                        val mappedResults = tvShowsResponse.results.map { item ->
+                                            item.copy(mediaType = "tv")
+                                        }
+                                        allMediaItems.addAll(mappedResults)
                                         hasMorePages = currentPage < tvShowsResponse.totalPages
                                         currentPage++
                                     }
@@ -185,7 +193,11 @@ private fun StreamingServiceTVContent(
                 
                 if (response.isSuccessful) {
                     response.body()?.let { tvShowsResponse ->
-                        allMediaItems.addAll(tvShowsResponse.results)
+                        // Ensure each item has the correct mediaType
+                        val mappedResults = tvShowsResponse.results.map { item ->
+                            item.copy(mediaType = "tv")
+                        }
+                        allMediaItems.addAll(mappedResults)
                         hasMorePages = currentPage < tvShowsResponse.totalPages
                         currentPage++
                     }
@@ -220,7 +232,11 @@ private fun StreamingServiceTVContent(
                                 
                                 if (response.isSuccessful) {
                                     response.body()?.let { tvShowsResponse ->
-                                        allMediaItems.addAll(tvShowsResponse.results)
+                                        // Ensure each item has the correct mediaType
+                                        val mappedResults = tvShowsResponse.results.map { item ->
+                                            item.copy(mediaType = "tv")
+                                        }
+                                        allMediaItems.addAll(mappedResults)
                                         hasMorePages = currentPage < tvShowsResponse.totalPages
                                         currentPage++
                                     }

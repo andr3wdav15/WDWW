@@ -13,4 +13,8 @@ data class MediaItem(
     @SerializedName("media_type") val mediaType: String?,
     @SerializedName("vote_average") val voteAverage: Double?,
     @SerializedName("genre_ids") val genreIds: List<Int>? = null
-)
+) {
+    override fun toString(): String {
+        return "MediaItem(id=$id, title=$title, name=$name, mediaType=$mediaType)"
+    }
+}

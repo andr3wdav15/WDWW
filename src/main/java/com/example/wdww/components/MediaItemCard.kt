@@ -1,6 +1,7 @@
 package com.example.wdww.components
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -38,7 +39,10 @@ fun MediaItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { showModal = true },
+            .clickable {
+                Log.d("MediaItemCard", "Card clicked: ${mediaItem.name ?: mediaItem.title} (ID: ${mediaItem.id}, Type: ${mediaItem.mediaType})")
+                showModal = true
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RectangleShape
     ) {
