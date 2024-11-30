@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.wdww.app-mergeDebugResources-57:/values-v30/values-v30.xml",
+            "map": [
+                {
+                    "source": "/Users/andrewdavis/.gradle/caches/8.9/transforms/e9f20216048e97a4ec00f4fa52c2c423/transformed/material3-release/res/values-v30/values-v30.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "72",
+                        "endOffsets": "123"
+                    }
+                }
+            ]
+        }
+    ]
+}
