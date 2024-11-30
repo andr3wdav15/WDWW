@@ -186,7 +186,7 @@ private fun AllTrendingContent(
         if (allMediaItems.isNotEmpty()) {
             MediaList(
                 mediaItems = allMediaItems,
-                headerTitle = "Trending",
+                headerTitle = "Trending Now",
                 showGenre = true,
                 showTypeWithGenre = true,
                 onLoadMore = {

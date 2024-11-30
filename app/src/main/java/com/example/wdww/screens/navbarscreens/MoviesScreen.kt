@@ -166,7 +166,7 @@ private fun PopularMoviesContent(
         if (allMediaItems.isNotEmpty()) {
             MediaList(
                 mediaItems = allMediaItems,
-                headerTitle = "Popular",
+                headerTitle = "Popular Movies",
                 showGenre = true,
                 onLoadMore = {
                     if (!isLoading && hasMorePages) {

@@ -38,7 +38,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val authService = NetworkClient.authApi
 
     // Authentication state management
-    private val _authState = MutableStateFlow<AuthState>(AuthState.Initial)
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     // Authentication status
@@ -62,11 +62,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 _isAuthenticated.value = !sessionId.isNullOrEmpty()
                 if (_isAuthenticated.value) {
                     _authState.value = AuthState.Authenticated
+                } else {
+                    _authState.value = AuthState.Initial
                 }
+                
                 if (sessionId != null) {
                     fetchAccountId(sessionId)
                 } else {
-                    _accountId.value = null
+                    _accountId.value = null 
                 }
             }
         }
