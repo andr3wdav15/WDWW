@@ -5,28 +5,19 @@
  */
 package com.example.wdww.network
 
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 
 /**
  * Singleton object providing configured Retrofit instances for TMDB API communication.
- * Uses OkHttp for the HTTP client with logging and authentication interceptors.
+ * Uses OkHttp for the HTTP client with authentication interceptor.
  */
 object NetworkClient {
     private const val BASE_URL = "https://api.themoviedb.org/3/"
     private const val API_KEY = "c5479e7394cd551bad2a1af7e9bff8a3"
-
-    /**
-     * Logging interceptor for debugging network requests and responses.
-     * Set to BODY level to log complete request/response details.
-     */
-    private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
-    }
 
     /**
      * Authentication interceptor that adds the API key to every request.
@@ -48,17 +39,13 @@ object NetworkClient {
     }
 
     /**
-     * Configured OkHttpClient with interceptors and timeouts.
-     * - Includes logging for debugging
-     * - Adds authentication to requests
-     * - Sets connection, read, and write timeouts to 15 seconds
+     * Configured OkHttpClient with interceptor and timeouts.
      */
     private val client = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
         .addInterceptor(authInterceptor)
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
-        .writeTimeout(15, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
         .build()
 
     /**

@@ -66,6 +66,7 @@ import android.util.Log
  * @param sharedViewModel ViewModel for sharing media-related data and operations
  * @param authViewModel ViewModel for authentication state and session management
  * @param isFavoritesList Boolean indicating if this item is being displayed from favorites list
+ * @param isFromNavDrawer Boolean indicating if this item is being accessed from nav drawer screens
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,7 +75,8 @@ fun MediaDetailModal(
     onDismiss: () -> Unit,
     sharedViewModel: SharedViewModel,
     authViewModel: AuthViewModel,
-    isFavoritesList: Boolean = false
+    isFavoritesList: Boolean = false,
+    isFromNavDrawer: Boolean = false
 ) {
     // State management for media details and user preferences
     val mediaDetails by sharedViewModel.selectedMediaDetails.collectAsState()
@@ -173,22 +175,24 @@ fun MediaDetailModal(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                mediaDetails?.backdropPath?.let { backdropPath ->
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data("https://image.tmdb.org/t/p/w1280$backdropPath")
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+            if (!(isLandscape && isFromNavDrawer)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(if (isLandscape) 400.dp else 200.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    mediaDetails?.backdropPath?.let { backdropPath ->
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data("https://image.tmdb.org/t/p/w1280$backdropPath")
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
 

@@ -77,7 +77,8 @@ fun MyMoviesScreen(
                 MediaPager(
                     mediaItems = favoriteMovies,
                     sharedViewModel = sharedViewModel,
-                    authViewModel = authViewModel
+                    authViewModel = authViewModel,
+                    isFromNavDrawer = true
                 )
             } else if (error == null) {
                 Text(

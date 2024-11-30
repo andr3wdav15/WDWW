@@ -37,13 +37,15 @@ import com.example.wdww.viewmodel.AuthViewModel
  * @param mediaItems List of media items (movies/TV shows) to display in the pager
  * @param sharedViewModel ViewModel for sharing data between components
  * @param authViewModel ViewModel for handling authentication state
+ * @param isFromNavDrawer Whether the media pager is opened from the navigation drawer
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaPager(
     mediaItems: List<MediaItem>,
     sharedViewModel: SharedViewModel,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    isFromNavDrawer: Boolean = false
 ) {
     // State to track the currently selected media item for showing the detail modal
     var selectedMedia by remember { mutableStateOf<MediaItem?>(null) }
@@ -154,7 +156,8 @@ fun MediaPager(
             mediaItem = media,
             onDismiss = { selectedMedia = null },
             sharedViewModel = sharedViewModel,
-            authViewModel = authViewModel
+            authViewModel = authViewModel,
+            isFromNavDrawer = isFromNavDrawer
         )
     }
 }

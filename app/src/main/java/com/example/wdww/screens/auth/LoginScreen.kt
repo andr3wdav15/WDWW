@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -44,15 +43,14 @@ import com.example.wdww.viewmodel.AuthViewModel
  */
 @Composable
 private fun BreathingLogo() {
-    val infiniteTransition = rememberInfiniteTransition(label = "breathing")
+    val infiniteTransition = rememberInfiniteTransition()
     val alpha by infiniteTransition.animateFloat(
         initialValue = 0.0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(1500, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
-        ),
-        label = "alpha"
+        )
     )
 
     Icon(
@@ -66,20 +64,16 @@ private fun BreathingLogo() {
 }
 
 /**
- * Stylized sign-in button with elevation and press animation.
+ * Stylized sign-in button with elevation and modern Material3 design.
  * 
  * @param onClick Callback function triggered when the button is clicked
  */
 @Composable
 private fun StylishSignInButton(onClick: () -> Unit) {
-    var isPressed by remember { mutableStateOf(false) }
-    val scale = if (isPressed) 0.95f else 1f
-    
     ElevatedButton(
         onClick = onClick,
         modifier = Modifier
             .width(120.dp)
-            .scale(scale)
             .padding(vertical = 8.dp),
         shape = RoundedCornerShape(24.dp),
         colors = ButtonDefaults.elevatedButtonColors(

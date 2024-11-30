@@ -16,7 +16,6 @@
 package com.example.wdww.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wdww.auth.AuthManager
@@ -37,24 +36,26 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val authManager = AuthManager(application)
     private val authService = NetworkClient.authApi
 
-    // Authentication state management
+    // StateFlow to track the current authentication state
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
-    // Authentication status
+    // StateFlow to track whether the user is authenticated
     private val _isAuthenticated = MutableStateFlow(false)
     val isAuthenticated = _isAuthenticated.asStateFlow()
 
-    // User account ID
+    // StateFlow to store the user's TMDB account ID
     private val _accountId = MutableStateFlow<Int?>(null)
     val accountId: StateFlow<Int?> = _accountId.asStateFlow()
 
-    // Temporary storage for the current request token
+    // Stores the current request token during the auth flow
     private var currentRequestToken: String? = null
 
     /**
-     * Initialize the ViewModel by checking for existing session
-     * and fetching account details if authenticated.
+     * Initializes the ViewModel by setting up authentication state observers.
+     * - Monitors the session ID from AuthManager
+     * - Updates authentication state based on session ID presence
+     * - Fetches account ID when session is valid
      */
     init {
         viewModelScope.launch {
@@ -76,8 +77,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Initiates the authentication process by creating a request token
-     * and preparing the authentication URL for user redirection.
+     * Initiates the authentication process with TMDB.
+     * Flow:
+     * 1. Creates a request token from TMDB API
+     * 2. If successful, prepares the auth URL for user login
+     * 3. Updates auth state to require user authentication
      */
     fun startAuth() {
         viewModelScope.launch {
@@ -104,8 +108,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Creates a session using an authenticated request token.
-     * If successful, stores the session ID and updates authentication state.
+     * Creates a new session using an authenticated request token.
+     * Called after user has approved the authentication request on TMDB.
      * 
      * @param requestToken The authenticated request token from TMDB
      */
@@ -113,34 +117,28 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 _authState.value = AuthState.Loading
-                Log.d("AuthViewModel", "Creating session with token: $requestToken")
-                
                 val response = authService.createSession(API_KEY, CreateSessionRequest(requestToken))
                 if (response.isSuccessful && response.body()?.success == true) {
                     val sessionId = response.body()?.sessionId
                     if (!sessionId.isNullOrEmpty()) {
-                        Log.d("AuthViewModel", "Session created successfully")
                         authManager.saveSessionId(sessionId)
                         _isAuthenticated.value = true
                         _authState.value = AuthState.Authenticated
                     } else {
-                        Log.e("AuthViewModel", "Session ID was null or empty")
                         _authState.value = AuthState.Error("Invalid session ID")
                     }
                 } else {
-                    Log.e("AuthViewModel", "Failed to create session: ${response.errorBody()?.string()}")
                     _authState.value = AuthState.Error("Failed to create session")
                 }
             } catch (e: Exception) {
-                Log.e("AuthViewModel", "Error creating session", e)
                 _authState.value = AuthState.Error(e.message ?: "Unknown error")
             }
         }
     }
 
     /**
-     * Logs out the user by clearing the stored session ID
-     * and resetting authentication state.
+     * Logs out the current user by clearing the session ID
+     * and resetting the auth state to initial.
      */
     fun logout() {
         viewModelScope.launch {
@@ -151,7 +149,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Retrieves the current session ID.
-     * 
      * @return The current session ID or null if not authenticated
      */
     suspend fun getSessionId(): String? {
@@ -159,10 +156,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Fetches the user's account ID using the session ID.
-     * Updates the accountId state flow with the result.
+     * Fetches the user's account ID from TMDB API.
+     * Called automatically when a valid session is established.
      * 
-     * @param sessionId The current session ID
+     * @param sessionId The current session ID to use for the API request
      */
     private suspend fun fetchAccountId(sessionId: String) {
         try {
@@ -170,8 +167,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             if (response.isSuccessful && response.body()?.id != null) {
                 _accountId.value = response.body()?.id
             }
-        } catch (e: Exception) {
-            Log.e("AuthViewModel", "Error fetching account ID", e)
+        } catch (_: Exception) {
+            // Account ID fetch failure is handled silently
         }
     }
 
@@ -191,15 +188,10 @@ sealed class AuthState {
     /** Loading state during network operations */
     object Loading : AuthState()
     
-    /** State requiring user authentication with TMDB
-     * @param authUrl URL for TMDB authentication
-     * @param requestToken Token for the authentication request
-     */
+    /** State requiring user authentication with TMDB */
     data class RequiresUserAuth(val authUrl: String, val requestToken: String) : AuthState()
     
-    /** Error state with error message
-     * @param message Description of the error
-     */
+    /** Error state with error message */
     data class Error(val message: String) : AuthState()
     
     /** Successfully authenticated state */

@@ -7,7 +7,6 @@
  * - Fullscreen swipeable TV show presentation
  * - Handles empty states and error conditions
  * - Real-time updates when favorites change
- * - Debug logging for tracking TV show data and state changes
  */
 package com.example.wdww.screens.navdrawerscreens
 
@@ -30,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import com.example.wdww.ui.components.MediaPager
 import com.example.wdww.viewmodel.SharedViewModel
 import com.example.wdww.viewmodel.AuthViewModel
-import android.util.Log
 
 /**
  * Main composable for the My TV Shows screen that displays the user's favorite TV shows.
@@ -40,17 +38,11 @@ import android.util.Log
  * - Displays TV shows in a fullscreen swipeable format using [MediaPager]
  * - Shows appropriate messages for empty states
  * - Displays error messages when something goes wrong
- * - Includes debug logging for tracking data flow and state changes
  *
  * The screen observes:
  * - Favorite TV shows from [SharedViewModel]
  * - Error states from [SharedViewModel]
  * - Account ID from [AuthViewModel]
- *
- * Debug logs include:
- * - When favorite TV shows are being refreshed
- * - Number of TV shows being displayed
- * - Details of each TV show (name, ID, media type)
  *
  * @param sharedViewModel ViewModel for sharing media data between screens
  * @param authViewModel ViewModel for handling authentication state and user data
@@ -68,7 +60,6 @@ fun MyTVShowsScreen(
     LaunchedEffect(accountId) {
         accountId?.let { id ->
             authViewModel.getSessionId()?.let { sessionId ->
-                Log.d("MyTVShowsScreen", "Refreshing favorite TV shows for account: $id")
                 sharedViewModel.refreshFavoriteTVShows(id, sessionId)
             }
         }
@@ -83,14 +74,11 @@ fun MyTVShowsScreen(
                 .padding(paddingValues)
         ) {
             if (favoriteTVShows.isNotEmpty()) {
-                Log.d("MyTVShowsScreen", "Displaying ${favoriteTVShows.size} favorite TV shows")
-                favoriteTVShows.forEach { show ->
-                    Log.d("MyTVShowsScreen", "TV Show: ${show.name ?: show.title} (ID: ${show.id}, Type: ${show.mediaType})")
-                }
                 MediaPager(
                     mediaItems = favoriteTVShows,
                     sharedViewModel = sharedViewModel,
-                    authViewModel = authViewModel
+                    authViewModel = authViewModel,
+                    isFromNavDrawer = true
                 )
             } else if (error == null) {
                 Text(
