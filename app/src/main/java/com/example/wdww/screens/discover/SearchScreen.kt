@@ -20,7 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.wdww.components.MediaList
+import com.example.wdww.ui.components.MediaList
 import com.example.wdww.model.media.MediaItem
 import com.example.wdww.network.NetworkClient
 import com.example.wdww.viewmodel.SharedViewModel

@@ -39,7 +39,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.navigation.compose.*
 import kotlinx.coroutines.launch
-import com.example.wdww.components.*
 import com.example.wdww.ui.theme.WDWWTheme
 import com.example.wdww.viewmodel.AuthViewModel
 import com.example.wdww.viewmodel.SharedViewModel
@@ -56,6 +55,10 @@ import android.os.Build
 import android.provider.Settings
 import com.example.wdww.navigation.Screen
 import com.example.wdww.screens.auth.LoginScreen
+import com.example.wdww.ui.components.BottomNavigationBar
+import com.example.wdww.ui.components.NavigationDrawer
+import com.example.wdww.ui.components.NavigationHost
+import com.example.wdww.ui.components.SearchBar
 
 /**
  * MainActivity is the single activity container for the WDWW app.
@@ -209,7 +212,7 @@ fun MainContent(
                 topBar = {
                     if (isPortrait) {
                         SearchBar(
-                            onMenuClick = { 
+                            onMenuClick = {
                                 scope.launch { drawerState.open() }
                             },
                             onSearchTextChanged = { sharedViewModel.updateSearchQuery(it) },
