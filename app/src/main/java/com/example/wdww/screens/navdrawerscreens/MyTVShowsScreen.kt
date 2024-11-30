@@ -11,10 +11,19 @@
  */
 package com.example.wdww.screens.navdrawerscreens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -54,6 +63,7 @@ fun MyTVShowsScreen(
     val favoriteTVShows by sharedViewModel.favoriteTVShows.collectAsState()
     val error by sharedViewModel.error.collectAsState()
     val accountId by authViewModel.accountId.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
     
     LaunchedEffect(accountId) {
         accountId?.let { id ->
@@ -64,34 +74,43 @@ fun MyTVShowsScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (favoriteTVShows.isNotEmpty()) {
-            Log.d("MyTVShowsScreen", "Displaying ${favoriteTVShows.size} favorite TV shows")
-            favoriteTVShows.forEach { show ->
-                Log.d("MyTVShowsScreen", "TV Show: ${show.name ?: show.title} (ID: ${show.id}, Type: ${show.mediaType})")
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            if (favoriteTVShows.isNotEmpty()) {
+                Log.d("MyTVShowsScreen", "Displaying ${favoriteTVShows.size} favorite TV shows")
+                favoriteTVShows.forEach { show ->
+                    Log.d("MyTVShowsScreen", "TV Show: ${show.name ?: show.title} (ID: ${show.id}, Type: ${show.mediaType})")
+                }
+                MediaPager(
+                    mediaItems = favoriteTVShows,
+                    sharedViewModel = sharedViewModel,
+                    authViewModel = authViewModel
+                )
+            } else if (error == null) {
+                Text(
+                    text = "No TV shows found",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                )
             }
-            MediaPager(
-                mediaItems = favoriteTVShows,
-                sharedViewModel = sharedViewModel,
-                authViewModel = authViewModel
-            )
-        } else if (error == null) {
-            Text(
-                text = "No TV shows found",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-            )
-        }
 
-        error?.let { errorMessage ->
-            Text(
-                text = errorMessage,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-            )
+            error?.let { errorMessage ->
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                )
+            }
         }
     }
 }

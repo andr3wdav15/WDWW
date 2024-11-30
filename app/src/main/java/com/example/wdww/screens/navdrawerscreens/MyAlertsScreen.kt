@@ -141,16 +141,13 @@ fun MyAlertsScreen(
                 )
             } else {
                 Log.d("MyAlertsScreen", "No alerts found")
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No alerts found",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
+                Text(
+                    text = "No alerts found",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                )
             }
 
             error?.let { errorMessage ->

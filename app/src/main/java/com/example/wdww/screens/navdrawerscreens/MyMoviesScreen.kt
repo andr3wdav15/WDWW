@@ -14,11 +14,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -51,6 +55,7 @@ fun MyMoviesScreen(
     val favoriteMovies by sharedViewModel.favoriteMovies.collectAsState()
     val error by sharedViewModel.error.collectAsState()
     val accountId by authViewModel.accountId.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
     
     LaunchedEffect(accountId) {
         accountId?.let { id ->
@@ -60,30 +65,39 @@ fun MyMoviesScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (favoriteMovies.isNotEmpty()) {
-            MediaPager(
-                mediaItems = favoriteMovies,
-                sharedViewModel = sharedViewModel,
-                authViewModel = authViewModel
-            )
-        } else if (error == null) {
-            Text(
-                text = "No movies found",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-            )
-        }
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            if (favoriteMovies.isNotEmpty()) {
+                MediaPager(
+                    mediaItems = favoriteMovies,
+                    sharedViewModel = sharedViewModel,
+                    authViewModel = authViewModel
+                )
+            } else if (error == null) {
+                Text(
+                    text = "No movies found",
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                )
+            }
 
-        error?.let { errorMessage ->
-            Text(
-                text = errorMessage,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-            )
+            error?.let { errorMessage ->
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp)
+                )
+            }
         }
     }
 } 

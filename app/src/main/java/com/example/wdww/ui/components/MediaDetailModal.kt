@@ -182,7 +182,7 @@ fun MediaDetailModal(
                 mediaDetails?.backdropPath?.let { backdropPath ->
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data("https://image.tmdb.org/t/p/original$backdropPath")
+                            .data("https://image.tmdb.org/t/p/w1280$backdropPath")
                             .crossfade(true)
                             .build(),
                         contentDescription = null,

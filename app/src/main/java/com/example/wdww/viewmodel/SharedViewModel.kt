@@ -87,6 +87,14 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
     // Theatre list state
     private val _theatreListItems = MutableStateFlow<List<MediaItem>>(emptyList())
 
+    // Current page in MediaPager
+    private val _currentPagerPage = MutableStateFlow(0)
+    val currentPagerPage: StateFlow<Int> = _currentPagerPage
+
+    fun setCurrentPagerPage(page: Int) {
+        _currentPagerPage.value = page
+    }
+
     /**
      * Theatre list ID with persistent storage handling
      */
